@@ -1,6 +1,9 @@
 
 import java.util.ArrayList;
+import java.util.List;
+import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableRowSorter;
 
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
@@ -18,9 +21,35 @@ public class listagemVIEW extends javax.swing.JFrame {
      */
     public listagemVIEW() {
         initComponents();
-        listarProdutos();
+        this.preencherTabela("");
     }
 
+    public List<ProdutosDTO> preencherTabela(String filtro) {
+        List<ProdutosDTO> listaTeste1 = new ArrayList();
+        ProdutosDAO dao = new ProdutosDAO();
+        boolean status = dao.conectar();
+        if (status == false) {
+            JOptionPane.showMessageDialog(null, "Erro de conexão");
+        } else {
+            List<ProdutosDTO> listaTeste = dao.listagem(filtro);
+            listaTeste1 = listaTeste;
+            DefaultTableModel tabelaProduto = (DefaultTableModel) listaProdutos.getModel();
+            listaProdutos.setRowSorter(new TableRowSorter(tabelaProduto));
+            tabelaProduto.setNumRows(0);
+            for (ProdutosDTO p : listaTeste) {
+                Object[] obj = new Object[]{
+                    p.getId(),
+                    p.getNome(),
+                    p.getValor(),
+                    p.getStatus()
+                };
+                tabelaProduto.addRow(obj);
+            }
+
+            dao.desconectar();
+        }
+        return listaTeste1;
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -142,7 +171,7 @@ public class listagemVIEW extends javax.swing.JFrame {
         ProdutosDAO produtosdao = new ProdutosDAO();
         
         //produtosdao.venderProduto(Integer.parseInt(id));
-        listarProdutos();
+        
     }//GEN-LAST:event_btnVenderActionPerformed
 
     private void btnVendasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVendasActionPerformed
@@ -202,25 +231,7 @@ public class listagemVIEW extends javax.swing.JFrame {
     private javax.swing.JTable listaProdutos;
     // End of variables declaration//GEN-END:variables
 
-    private void listarProdutos(){
-        try {
-            ProdutosDAO produtosdao = new ProdutosDAO();
-            
-            DefaultTableModel model = (DefaultTableModel) listaProdutos.getModel();
-            model.setNumRows(0);
-            
-            ArrayList<ProdutosDTO> listagem = produtosdao.listarProdutos();
-            
-            for(int i = 0; i < listagem.size(); i++){
-                model.addRow(new Object[]{
-                    listagem.get(i).getId(),
-                    listagem.get(i).getNome(),
-                    listagem.get(i).getValor(),
-                    listagem.get(i).getStatus()
-                });
-            }
-        } catch (Exception e) {
-        }
+   
     
-    }
+    
 }
