@@ -1,3 +1,8 @@
+
+import java.util.ArrayList;
+import java.util.List;
+import javax.swing.JOptionPane;
+
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
@@ -9,11 +14,14 @@
  */
 public class cadastroVIEW extends javax.swing.JFrame {
 
-    /**
-     * Creates new form cadastroVIEW
-     */
+     List<ProdutosDTO> listaTESTE = new ArrayList();
+     
     public cadastroVIEW() {
         initComponents();
+        listagemVIEW testl = new listagemVIEW();
+        testl.setVisible(false);
+        listaTESTE = testl.preencherTabela("");
+        testl.dispose();
     }
 
     /**
@@ -142,16 +150,44 @@ public class cadastroVIEW extends javax.swing.JFrame {
 
     private void btnCadastrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCadastrarActionPerformed
         ProdutosDTO produto = new ProdutosDTO();
-        String nome = cadastroNome.getText();
-        String valor = cadastroValor.getText();
-        String status = "A Venda";
-        produto.setNome(nome);
-        produto.setValor(Integer.parseInt(valor));
-        produto.setStatus(status);
+
+        boolean status;
+        int resposta;
+        int listaIndex;
         
-        ProdutosDAO produtodao = new ProdutosDAO();
-        produtodao.cadastrarProduto(produto);
-        
+      
+        listagemVIEW testl = new listagemVIEW();
+        testl.setVisible(false);
+        listaTESTE = testl.preencherTabela("");
+        testl.dispose();
+       
+        listaIndex = listaTESTE.size() + 2;
+        produto.setId(listaIndex);
+        produto.setNome(cadastroNome.getText());
+        produto.setValor(Integer.parseInt(cadastroValor.getText()));
+        produto.setStatus("A Venda");
+
+        ProdutosDAO produtoDAO = new ProdutosDAO();
+
+        status = produtoDAO.conectar();
+        if (status == false) {
+            JOptionPane.showMessageDialog(null, "Erro de conexão");
+
+        } else {
+            resposta = produtoDAO.salvar(produto);
+            if (resposta == 1) {
+                JOptionPane.showMessageDialog(null, "Dados incluidos com sucesso");
+
+            } else if (resposta == 1062) {
+                JOptionPane.showMessageDialog(null, "Produto já foi cadastrado");
+
+            } else {
+                JOptionPane.showMessageDialog(null, "Erro ao tentar inserir dados");
+
+            }
+
+            produtoDAO.desconectar();
+        }
     }//GEN-LAST:event_btnCadastrarActionPerformed
 
     private void btnProdutosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnProdutosActionPerformed
